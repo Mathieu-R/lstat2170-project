@@ -1,0 +1,26 @@
+\documentclass[10pt, a4paper, nofootinbib]{scrartcl}
+
+\newcommand{\pagetitle}{} 
+
+\input{../header}
+\input{../preamble}
+
+\pagenumbering{arabic}
+
+\begin{document}
+
+\input{sections/cover-page.tex}
+
+\setcounter{page}{1}
+
+\input{sections/intro.tex}
+\input{sections/analysis.tex}
+\input{sections/box-jenkins.tex}
+
+\newpage
+
+\appendix
+
+\input{sections/appendix.tex}
+
+\end{document}

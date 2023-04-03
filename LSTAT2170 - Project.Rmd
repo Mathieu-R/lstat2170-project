@@ -1,0 +1,126 @@
+---
+title: "LSTAT2170 - Project"
+author: "Mathieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load libraries
+```{r}
+library(astsa)
+library(mgcv)
+library(simts)
+
+library(fpp2)
+library(seasonal)
+library(ggplot2)
+library(cowplot)
+```
+
+```{r}
+source("utils/FonctionsSeriesChrono.r")
+```
+
+### Import data
+
+Mean monthly air temperature (Deg. C) in Recife (Brazil) during 1986-1995.
+```{r}
+data <- read.table("dataset/recife.txt")
+```
+
+### Preliminary analysis
+
+```{r}
+temp_ts <- gts(
+  data, 
+  start = 1986, 
+  freq = 12, 
+  unit_ts = "°C",
+  name_ts = "Air temperature",
+  name_time = "Year",
+  data_name = "Mean monthly air temperature in Recife (Brazil)"
+)
+
+plot(temp_ts)
+```
+```{r}
+temp_ts <- ts(data, start = 1986, frequency = 12)
+
+# autoplot(temp_ts) + xlab("Year") + ylab("Air temperature (°C)") + ggtitle("Mean monthly temperature in Recife (Brazil)")
+
+temp_ts %>% 
+  decompose(type="additive") %>% 
+  autoplot() +
+  xlab("Year") +
+  ggtitle("Classical decomposition of air temperature time serie")
+
+temp_ts %>%
+  seas() %>%
+  autoplot() +
+  xlab("Year") +
+  ggtitle("Classical decomposition of air temperature time serie")
+```
+
+```{r}
+temp_ts %>%
+  ggseasonplot(year.labels = TRUE, year.labels.left = TRUE) +
+  ylab("Air temperature (°C)")
+  ggtitle("Seasonal plot for mean air temperature in Recife (Brazil)")
+```
+
+### Box Jenkins analysis
+
+Seasonal difference
+```{r}
+temp_ts_no_season <- diff(temp_ts, lag = 12)
+
+t <- seq(from = 1986 + 1/12, by = 1/12, length = length(temp_ts_no_season))
+reg_line <- tslm(temp_ts_no_season ~ t)
+
+temp_ts_no_season %>%
+  autoplot() +
+    geom_abline(
+      slope = reg_line$coefficients[2],
+      intercept = reg_line$coefficients[1],
+      color = "red"
+    ) +
+    xlab("Year") +
+    ylab("Seasonally differenced air temperature (°C)") +
+    ggtitle("Deseasonalized mean monthly temperature in Recife (Brazil)")
+```
+
+Trend difference
+```{r}
+temp_ts_no_season_no_trend <- diff(temp_ts_no_season, lag = 1)
+
+t <- seq(from = 1986 + 1/12, by = 1/12, length = length(temp_ts_no_season_no_trend))
+reg_line <- tslm(temp_ts_no_season_no_trend ~ t)
+
+temp_ts_no_season_no_trend %>%
+  autoplot() +
+    geom_abline(
+        slope = reg_line$coefficients[2],
+        intercept = reg_line$coefficients[1],
+        color = "red"
+      ) +
+    xlab("Year") +
+    ylab("Doubly differenced air temperature (°C)") +
+    ggtitle("Deseasonalized and detrended mean monthly temperature in Recife (Brazil)")
+```
+
+```{r}
+temp_ts_diff <- temp_ts_no_season_no_trend
+```
+
+### ACF and PACF plots
+
+```{r}
+acf <- ggAcf(temp_ts_diff)
+pacf <- ggPacf(temp_ts_diff)
+
+plot_grid(acf, pacf, ncol = 2)
+```
