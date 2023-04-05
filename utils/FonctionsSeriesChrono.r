@@ -35,7 +35,7 @@ Comp.Sarima = function(donnees, d, saison, D, p.max, q.max, P.max, Q.max){
 #============================================================================
 
 # initialisation d'une table ? 4D reprennant les AIC des mod?les test?s
-AIC.table <-  array(dim = c(p.max + 1, q.max + 1 , P.max + 1, Q.max + 1))
+AIC.table <-  array(dim = c(p.max + 1, q.max + 1, P.max + 1, Q.max + 1))
 
 # construction de la table des AIC
 for(i in 0:p.max){

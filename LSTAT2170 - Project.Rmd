@@ -6,7 +6,15 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(comment = "")
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+```{r}
+# clean variables
+rm(list = ls())
 ```
 
 ### Load libraries
@@ -18,11 +26,16 @@ library(simts)
 library(fpp2)
 library(seasonal)
 library(ggplot2)
+library(dplyr)
+library(zoo)
 library(cowplot)
+
+library(gt)
 ```
 
 ```{r}
 source("utils/FonctionsSeriesChrono.r")
+source("utils/model_selection.r")
 ```
 
 ### Import data
@@ -68,7 +81,7 @@ temp_ts %>%
 ```{r}
 temp_ts %>%
   ggseasonplot(year.labels = TRUE, year.labels.left = TRUE) +
-  ylab("Air temperature (°C)")
+  ylab("Air temperature (°C)") +
   ggtitle("Seasonal plot for mean air temperature in Recife (Brazil)")
 ```
 
@@ -118,9 +131,141 @@ temp_ts_diff <- temp_ts_no_season_no_trend
 
 ### ACF and PACF plots
 
+Yearly dependence
 ```{r}
-acf <- ggAcf(temp_ts_diff)
-pacf <- ggPacf(temp_ts_diff)
+acf <- ggAcf(temp_ts_diff, lag.max = 96) +
+  ggtitle("PACF on a yearly basis")
+pacf <- ggPacf(temp_ts_diff, lag.max = 96) +
+  ggtitle("PACF on a yearly basis")
 
 plot_grid(acf, pacf, ncol = 2)
+```
+
+```{r}
+acf <- ggAcf(temp_ts_diff, lag.max = 12) +
+  ggtitle("ACF on a monthly basis")
+pacf <- ggPacf(temp_ts_diff, lag.max = 12) +
+  ggtitle("PACF on a monthly basis")
+
+plot_grid(acf, pacf, ncol = 2)
+```
+
+### Model selection
+
+```{r}
+model_selection_df <- select.sarima(
+  temp_ts,
+  d = 1, 
+  D = 1,
+  max.p = 4,
+  max.q = 6,
+  max.P = 1,
+  max.Q = 1,
+  season = 12
+) 
+
+n_models <- nrow(model_selection_df)
+
+model_selection_df %>%
+  slice_min(n = round(n_models / 10), order_by = AIC) %>%
+  gt %>%
+  tab_header(
+    title = "SARIMA model selection"
+  ) #%>%
+  #gtsave("report/figures/box_jenkins/sarima_model_selection.png")
+```
+
+### Model validation
+
+```{r}
+model1 <- arima(
+  temp_ts, 
+  order = c(0, 1, 2), 
+  seasonal = list(order = c(0, 1, 1), period = 12), 
+  method = "ML"
+)
+
+model2 <- arima(
+  temp_ts,
+  order = c(0, 1, 2),
+  seasonal = list(order = c(1, 1, 1), period = 12),
+  method = "ML"
+)
+
+model3 <- arima(
+  temp_ts,
+  order = c(1, 1, 1),
+  seasonal = list(order = c(0, 1, 1), period = 12),
+  method = "ML"
+)
+```
+
+#### Coefficients significance
+
+```{r}
+coefficients.significance(model1)
+coefficients.significance(model2)
+coefficients.significance(model3)
+```
+
+#### Residuals analysis
+
+```{r}
+checkresiduals(model1)
+```
+
+```{r}
+checkresiduals(model3)
+```
+
+#### Prediction power
+
+```{r}
+n <- length(temp_ts)
+first80 <- floor(n * 0.8)
+
+pred_power_model1 <- predictive.power(
+  temp_ts,
+  order = c(0, 1, 2), 
+  seasonal = list(order = c(0, 1, 1), period = 12)
+)
+
+pred_power_model3 <- predictive.power(
+  temp_ts,
+  order = c(1, 1, 1),
+  seasonal = list(order = c(0, 1, 1), period = 12)
+)
+```
+
+```{r}
+temp_ts_last_2years <- ts(temp_ts[((n-24)+1):n], start = 1994, frequency = 12)
+
+temp_ts_last_2years %>%
+  autoplot(linetype = "dotted") +
+    geom_line(data = pred_power_model1$data, aes(x = time, y = fitted, colour = "model 1")) +
+    geom_line(data = pred_power_model3$data, aes(x = time, y = fitted, colour = "model 3")) +
+    scale_color_manual(name = "SARIMA models", values = c("model 1" = "orange", "model 3" = "darkblue")) +
+    labs(
+      x = "Date",
+      y = "Air temperature (°C)",
+      title = "Prediction power for mean monthly temperature in Recife (Brazil)"
+    ) +
+    theme_minimal()
+```
+
+```{r}
+data.frame(
+  "model_1" = round(pred_power_model1$mse, 3),
+  "model_3" = round(pred_power_model3$mse, 3)
+) %>%
+  gt() %>%
+  tab_header({
+    title = "MSE comparison of the SARIMA models"
+  }) #%>%
+  #gtsave("report/figures/box_jenkins/predictive_power_mse.png")
+```
+
+### Prediction
+
+```{r}
 ```
