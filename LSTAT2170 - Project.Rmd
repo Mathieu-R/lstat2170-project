@@ -25,8 +25,8 @@ library(simts)
 
 library(fpp2)
 library(seasonal)
-library(ggplot2)
-library(dplyr)
+
+library(tidyverse)
 library(zoo)
 library(cowplot)
 
@@ -59,6 +59,17 @@ temp_ts <- gts(
 )
 
 plot(temp_ts)
+
+temp_ts <- ts(data, start = 1986, frequency = 12)
+
+temp_ts %>%
+  autoplot() +
+  labs(
+    x = "Year",
+    y = "Air temperature (°C)",
+    title = "Mean monthly air temperature in Recife (Brazil)"
+  ) +
+  theme_minimal()
 ```
 ```{r}
 temp_ts <- ts(data, start = 1986, frequency = 12)
@@ -178,21 +189,21 @@ model_selection_df %>%
 ### Model validation
 
 ```{r}
-model1 <- arima(
+model1 <- Arima(
   temp_ts, 
   order = c(0, 1, 2), 
   seasonal = list(order = c(0, 1, 1), period = 12), 
   method = "ML"
 )
 
-model2 <- arima(
+model2 <- Arima(
   temp_ts,
   order = c(0, 1, 2),
   seasonal = list(order = c(1, 1, 1), period = 12),
   method = "ML"
 )
 
-model3 <- arima(
+model3 <- Arima(
   temp_ts,
   order = c(1, 1, 1),
   seasonal = list(order = c(0, 1, 1), period = 12),
@@ -254,6 +265,34 @@ temp_ts_last_2years %>%
 ```
 
 ```{r}
+date <- zoo::as.Date(temp_ts_last_2years)
+
+compare_ts <- data.frame(
+  date = date,
+  data = temp_ts_last_2years,
+  model1 = pred_power_model1$data$fitted,
+  model3 = pred_power_model3$data$fitted
+) %>%
+  gather(key = "series", value = "values", -date)
+
+ggplot(compare_ts, aes(x = date, y = values,  color = series)) +
+  geom_line() + 
+  scale_color_manual(
+    values = c("data" = "black", "model1" = "orange", "model3" = "darkblue"),
+    labels = c("data" = "data", "model1"= "model 1", "model3" = "model 3")
+  ) +
+  scale_linetype_manual(values = c("data" = "dashed", "model1" = "solid", "model3"= "solid")) +
+  scale_size_manual(values = c("data" = 1.2, "model1" = 1.0, "model3" = 1.0)) +
+  labs(
+      x = "Date",
+      y = "Air temperature (°C)",
+      title = "Prediction power for mean monthly temperature in Recife (Brazil)",
+      color = "Series"
+    ) +
+  theme_minimal()
+```
+
+```{r}
 data.frame(
   "model_1" = round(pred_power_model1$mse, 3),
   "model_3" = round(pred_power_model3$mse, 3)
@@ -264,8 +303,52 @@ data.frame(
   }) #%>%
   #gtsave("report/figures/box_jenkins/predictive_power_mse.png")
 ```
-
-### Prediction
+### Forecasting
 
 ```{r}
+prediction <- model3 %>% forecast(h = 12)
+
+combined_data <- data.frame(
+  Date = c(time(temp_ts), time(prediction$mean)),
+  Temperature = c(temp_ts, prediction$mean),
+  Upper = c(rep(NA, length(temp_ts)), prediction$upper[, 2]),
+  Lower = c(rep(NA, length(temp_ts)), prediction$lower[, 2]),
+  Type = c(rep("Data", length(temp_ts)), rep("Forecast", 12))
+)
+
+ggplot(combined_data, aes(x = Date, y = Temperature)) +
+  geom_line(aes(color = Type)) +
+  geom_ribbon(aes(ymin = Lower, ymax = Upper), fill = "lightblue", alpha = 0.3) +
+  scale_color_manual(values = c("Data" = "black", "Forecast" = "blue")) +
+  labs(
+    title = "Forecast of mean monthly temperature in Recife (Brazil) for the next 12 months",
+    subtitle = "Forecast made with a SARIMA model",
+    x = "Year", 
+    y = "Air temperature (°C)"
+  ) + 
+  theme_minimal()
+```
+
+```{r}
+prediction <- ets(temp_ts) %>% forecast(h = 12)
+
+combined_data <- data.frame(
+  Date = c(time(temp_ts), time(prediction$mean)),
+  Temperature = c(temp_ts, prediction$mean),
+  Upper = c(rep(NA, length(temp_ts)), prediction$upper[, 2]),
+  Lower = c(rep(NA, length(temp_ts)), prediction$lower[, 2]),
+  Type = c(rep("Data", length(temp_ts)), rep("Forecast", 12))
+)
+
+ggplot(combined_data, aes(x = Date, y = Temperature)) +
+  geom_line(aes(color = Type)) +
+  geom_ribbon(aes(ymin = Lower, ymax = Upper), fill = "lightblue", alpha = 0.3) +
+  scale_color_manual(values = c("Data" = "black", "Forecast" = "blue")) +
+  labs(
+    title = "Forecast of mean monthly temperature in Recife (Brazil) for the next 12 months", 
+    subtitle = "Forecast made with Holt Winters' seasonal method",
+    x = "Year", 
+    y = "Air temperature (°C)"
+  ) + 
+  theme_minimal()
 ```

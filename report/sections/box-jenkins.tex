@@ -178,6 +178,23 @@ Despite our models passing the Ljung-Box test, we want to ensure they have good 
 \begin{figure}[H]
 	\centering
 	\includegraphics{figures/box_jenkins/predictive_power.png}
-	\caption{Predictive power of the three SARIMA models compared with the last two years of the original data (\textit{in dotted black}).}
+	\caption{Predictive power of the two SARIMA models (1 and 3) compared with the last two years of the original data (\textit{in dotted black}).}
 	\label{fig:predictive-power}
 \end{figure}
+
+...
+
+Looking at the MSE of the prediction, we notice that the model 3 is slightly better than model 1 with an MSE of $0.134$.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{figures/box_jenkins/predictive_power_mse.png}
+	\caption{Predictive power of the two SARIMA models (1 and 3).}
+	\label{fig:predictive-power-mse}
+\end{figure}
+
+Therefore, we choose to keep the model $3$ as the final model for forecasting. This model $(1, 1, 1) \times (0, 1, 1)_{12}$ can be written the following way,
+
+\begin{equation} \label{eq:final-model}
+	(1 - \phi_1 B)(1 - B)(1 - B^{12}) = (1 + \theta_1 B)(1 + \Theta_1 B^{12}) \varepsilon_t
+\end{equation}
+where $B$ is the \textit{"backshift operator"} and $\phi_1 = 0.3529$, $\theta_1 = -0.8946$, $\Theta_1 = -0.9999$.
