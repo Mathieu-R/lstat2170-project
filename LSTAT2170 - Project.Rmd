@@ -80,7 +80,8 @@ temp_ts %>%
   decompose(type="additive") %>% 
   autoplot() +
   xlab("Year") +
-  ggtitle("Classical decomposition of air temperature time serie")
+  ggtitle("Classical decomposition of air temperature time serie") +
+  theme_minimal()
 
 temp_ts %>%
   seas() %>%
@@ -93,7 +94,8 @@ temp_ts %>%
 temp_ts %>%
   ggseasonplot(year.labels = TRUE, year.labels.left = TRUE) +
   ylab("Air temperature (°C)") +
-  ggtitle("Seasonal plot for mean air temperature in Recife (Brazil)")
+  ggtitle("Seasonal plot for mean air temperature in Recife (Brazil)") +
+  theme_minimal()
 ```
 
 ### Box Jenkins analysis
@@ -114,12 +116,13 @@ temp_ts_no_season %>%
     ) +
     xlab("Year") +
     ylab("Seasonally differenced air temperature (°C)") +
-    ggtitle("Deseasonalized mean monthly temperature in Recife (Brazil)")
+    ggtitle("Deseasonalized mean monthly temperature in Recife (Brazil)") +
+    theme_minimal()
 ```
 
 Trend difference
 ```{r}
-temp_ts_no_season_no_trend <- diff(temp_ts_no_season, lag = 1)
+temp_ts_no_season_no_trend <- diff(diff(diff(temp_ts_no_season, lag = 1), lag = 1), lag = 1)
 
 t <- seq(from = 1986 + 1/12, by = 1/12, length = length(temp_ts_no_season_no_trend))
 reg_line <- tslm(temp_ts_no_season_no_trend ~ t)
@@ -133,7 +136,8 @@ temp_ts_no_season_no_trend %>%
       ) +
     xlab("Year") +
     ylab("Doubly differenced air temperature (°C)") +
-    ggtitle("Deseasonalized and detrended mean monthly temperature in Recife (Brazil)")
+    ggtitle("Deseasonalized and detrended mean monthly temperature in Recife (Brazil)") +
+    theme_minimal()
 ```
 
 ```{r}
@@ -275,7 +279,7 @@ compare_ts <- data.frame(
 ) %>%
   gather(key = "series", value = "values", -date)
 
-ggplot(compare_ts, aes(x = date, y = values,  color = series)) +
+ggplot(compare_ts, aes(x = date, y = values, color = series)) +
   geom_line() + 
   scale_color_manual(
     values = c("data" = "black", "model1" = "orange", "model3" = "darkblue"),

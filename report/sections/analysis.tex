@@ -11,14 +11,14 @@ with $S_t$, $T_t$ and $R_t$ respectively the seasonal, the trend-cycle and the r
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/basic_analysis/data_time_series.png}
+	\includegraphics[width=0.9\textwidth]{figures/basic_analysis/data_time_series.png}
 	\caption{Time series for the mean monthly air temperature in the city of Recife (Brazil) for the years $1986-1995$}
 	\label{fig:data-time-series}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/basic_analysis/time_serie_decomposition.png}
+	\includegraphics[width=0.9\textwidth]{figures/basic_analysis/time_serie_decomposition.png}
 	\caption{Decomposition of the time serie $X_t$ into seasonal, trend-cycle and reminder components}
 	\label{fig:data-classical-decomposition}
 \end{figure}
@@ -26,11 +26,11 @@ with $S_t$, $T_t$ and $R_t$ respectively the seasonal, the trend-cycle and the r
 Being situated in the southern hemisphere, the Brazil has its seasons inverted compared to our regions. 
 This country is situated near the equator and therefore has pretty high temperature all the year long. However, the highest temperatures happen between the end and the beginning of the year and the lowest toward the middle of the year. That's clearly what we can notice in the seasonal part (\autoref{fig:data-classical-decomposition}). We can also notice a decreasing trend in the temperatures between $1988$ and $1993$ before it rises up again.
 
-An interesting thing we can do is to emphasis the seasons with a seasonal plot 
+An interesting thing we can do is to emphasis the seasons with a seasonal plot. We notice in particular that the seasonal variations are roughly constants over the years. That's why we can assume an additive decomposition.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/basic_analysis/time_serie_seasonal_plot.png}
+	\includegraphics[width=0.9\textwidth]{figures/basic_analysis/time_serie_seasonal_plot.png}
 	\caption{Seasonal plot for the mean air temperature in Recife (Brazil)}
 	\label{fig:seasonal-plot}
 \end{figure}

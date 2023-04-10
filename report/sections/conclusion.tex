@@ -1,1 +1,9 @@
 \section{Conclusion}
+
+We first plotted the time series and decomposed it into its trend, seasonal and remainder components assuming an additive decomposition. We saw this was an honest assumption because the seasonal variations were roughly constants over the years. Noticing the presence of seasons and trend, we first had to difference the time serie to remove them.
+
+After doing so, we could analyse the ACF and PACF plots and made a first intuition about some possible SARIMA models we could pick in order to modelise our time serie. To confirm our intuition, we performed model selection and looked at different error criterions like the AIC and BIC. We selected the top $10\%$ of models with the minimum AIC and decided to keep three models: two ... models () and one more complex model ().
+
+Testing the coefficients significance, we removed the most complex model because it had one unsignificant coefficients for a level $\alpha = 5\%$. We also ensure that the residuals of the two other models were not serially correlated.
+
+We finally compare the prediction power of these two lasting models comparing the last $2$ years of the original data with a prediction made with these SARIMA models. We kept the one that minimized the mean sqaured error, that is the "model 3". As a last step, we predicted the mean monthly air temperature in Recife for the next $12$ months using our chosen SARIMA model and also with an Holt-Winters seasonal method. We did not notice a clear difference between the two predictions. The two predicted ...
