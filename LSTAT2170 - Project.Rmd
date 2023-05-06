@@ -122,7 +122,7 @@ temp_ts_no_season %>%
 
 Trend difference
 ```{r}
-temp_ts_no_season_no_trend <- diff(diff(diff(temp_ts_no_season, lag = 1), lag = 1), lag = 1)
+temp_ts_no_season_no_trend <- diff(temp_ts_no_season, lag = 1)
 
 t <- seq(from = 1986 + 1/12, by = 1/12, length = length(temp_ts_no_season_no_trend))
 reg_line <- tslm(temp_ts_no_season_no_trend ~ t)

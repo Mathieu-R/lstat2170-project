@@ -4,7 +4,7 @@ In the last part of this project, we want to forecast the monthly mean air tempe
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/forecast/sarima_forecast.png}
+	\includegraphics[width=0.9\textwidth]{figures/forecast/sarima_forecast.png}
 	\caption{Forecast with a SARIMA model of the mean monthly air temperature in Recife (Brazil) for the next 12 months}
 	\label{fig:sarima-forecast}
 \end{figure}
@@ -19,11 +19,11 @@ Here, we use the Holt-Winters' additive method because our serie shows roughly c
 	\hat{X}_{t + H} = l_t + h b_t + s_{t + h - m(k + 1)}
 \end{equation}
 
-where $m = 12$ is the number of seasons in a year, $k \equiv int(h - 1) / m$ and $l_t$, $b_t$, and $s_t$ are respectively the smoothing equations for the level $l_t$ of the serie, the trend $b_t$ and the seasonal component $s_t$.
+where $m = 12$ is the number of seasons in a year, $k \equiv \text{int}(h - 1) / m$ and $l_t$, $b_t$, and $s_t$ are respectively the smoothing equations for the level $l_t$ of the serie, the trend $b_t$ and the seasonal component $s_t$.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/forecast/hw_forecast.png}
+	\includegraphics[width=0.9\textwidth]{figures/forecast/hw_forecast.png}
 	\caption{Forecast with a Holt-Winters' seasonal method of the mean monthly air temperature in Recife (Brazil) for the next 12 months}
 	\label{fig:hw-forecast}
 \end{figure}

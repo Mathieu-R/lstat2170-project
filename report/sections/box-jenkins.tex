@@ -1,13 +1,13 @@
 \section{Box-Jenkins analysis} 
 
-Before going further and select a model that will be able to predict the air temperature in Recife for the months following the year $1995$, we need to detrend and deseasonalize our time serie. 
+Before going further and select a model that will be able to predict the air temperature in Recife for the months following the year $1995$, we need to detrend and deseasonalize our time series. Indeed we a stationaty time series (at least a weak form) ...
 
 % TODO: explain why we need stationary time series
 
 \subsection{Differencing}
 
-We first remove the seasonality by taking a seasonal difference which consist by taking the difference between an observation and the previous observation at the same season (in our case, $12$ months before): $X'_t = X_t - X_{t-12}$. 
-Then, we remove the trend by first differencing the serie.
+We first remove the seasonality by taking a seasonal difference which consists by taking the difference between an observation and the previous observation at the same season (in our case, $12$ months before): $X'_t = X_t - X_{t-12}$. 
+Then, we remove the trend by first differencing the series.
 
 \begin{figure}[H]
 	\centering
@@ -41,7 +41,7 @@ On a yearly basis, up to a lag of $8$ years, the ACF converge toward zero likewi
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/box_jenkins/yearly_acf_pacf.png}
+	\includegraphics[width=0.8\textwidth]{figures/box_jenkins/yearly_acf_pacf.png}
 	\caption{ACF and PACF plots on a yearly basis}
 	\label{fig:yearly-acf-pacf}
 \end{figure}
@@ -50,7 +50,7 @@ We can restreint ourselve to a monthly basis to check for any non-seasonal compo
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/box_jenkins/monthly_acf_pacf.png}
+	\includegraphics[width=0.8\textwidth]{figures/box_jenkins/monthly_acf_pacf.png}
 	\caption{ACF and PACF plots on a monthly basis}
 	\label{fig:monthly-acf-pacf}
 \end{figure}
@@ -71,7 +71,7 @@ But because of the decay in ACF and PACF on a yearly basis, we could as well mod
 
 \subsection{Automatic model selection with AIC and BIC}
 
-After guessing the ideal model, we perform model selection for p and q up to $4$ and $6$ respectively because both ACF and PACF plots have at least one spike near outside the confidence interval. We also choose P and Q both up to $1$. Below are the top $10\%$ models based on the AIC criterion. We chose to also compute the BIC (as the AIC tend to overestimate the number of parameters) and the log likelihood.
+After guessing the ideal model, we perform model selection for \textbf{p} and \textbf{q} up to $4$ and $6$ respectively because both ACF and PACF plots have at least one spike near outside the confidence interval. We also choose \textbf{P} and \textbf{Q} both up to $1$. Below are the top $\SI{10}{\%}$ models based on the AIC criterion. We chose to also compute the BIC (as the AIC tend to overestimate the number of parameters) and the log-likelihood.
 
 \begin{figure}[H]
 	\centering
@@ -91,7 +91,7 @@ Nevertheless, we will compare it with a model that has one more parameter,
 	\text{model 2}: \quad (0, 1, 2) \times (1, 1, 1)_{12}
 \end{equation}
 
-We could also compare it with, 
+We could finally also try this model that has a low BIC and few parameters, 
 \begin{equation}
 	\text{model 3}: \quad (1, 1, 1) \times (0, 1, 1)_{12}
 \end{equation}
@@ -101,7 +101,6 @@ We could also compare it with,
 \subsubsection{Coefficients significance}
 
 We first want to verify that the coefficients of our model are statistically significants. To do that, we perform the following univariate two sided hypothesis test which is based on a normal approximation,
-
 \begin{align*}
 	H_0&: \text{coeff}(i) = 0 \\
 	H_1&: \text{coeff}(i) \neq 0
@@ -142,7 +141,7 @@ The results are the summarized in the following tables,
 	\label{tab:coefficients-significance-model3}
 \end{table}
 
-Based on this analysis, for a level of significance of $5\%$, we can reject our second model as it has one coefficient not statistically significant and we conclude that it is better to consider a model with $3$ coefficients.
+Based on this analysis, for a level of significance of $\SI{5}{\percent}$, we can reject our second model as it has one coefficient not statistically significant and we conclude that it is better to consider a model with $3$ coefficients.
 
 \subsubsection{Residual analysis}
 
@@ -158,36 +157,36 @@ We want to check if there is any correlation in the residuals of our models. To 
 	\centering
 	\begin{subfigure}{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/box_jenkins/ljung_box_test_model1.png}
+		\includegraphics[width=0.9\textwidth]{figures/box_jenkins/ljung_box_test_model1.png}
 		\label{fig:ljung-box-test-model1}
 	\end{subfigure}
 	\begin{subfigure}{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/box_jenkins//ljung_box_test_model3.png}
+		\includegraphics[width=0.9\textwidth]{figures/box_jenkins//ljung_box_test_model3.png}
 		\label{fig:ljung-box-test-model3}
 	\end{subfigure}
 	\caption{Ljung-Box test for model 1 (at left) and model 3 (deseasoned and detrended) (at right).}
 \end{figure}
 
-All the three models pass the Ljung-Box test at $5\%$ significance level. Then, the residuals are not correlated and we should have an accurate prediction interval. Moreover, the residuals are more or less normals (\autoref{fig:residuals_analysis_model1}, \autoref{fig:residuals_analysis_model2})
+We notice that at $5\%$ significance level, we cannot reject the null hypothesis for the two models. Then, the residuals are not correlated and we should have an accurate prediction interval. Moreover, the residuals are more or less normals (\autoref{fig:residuals_analysis_model1}, \autoref{fig:residuals_analysis_model2})
 
 \subsubsection{Predictive power}
 
-Despite our models passing the Ljung-Box test, we want to ensure they have good predictive power by comparing the last $20\%$ (i.e. last two years) of the original time serie with a forecast for these same $20\%$ using our models.
+Despite our models passing the Ljung-Box test, we want to ensure they have good predictive power by comparing the last $\SI{20}{\percent}$ (i.e. the last two years) of the original time series with a forecast for these same $\SI{20}{\percent}$ using our models.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{figures/box_jenkins/predictive_power.png}
+	\includegraphics[width=0.8\textwidth]{figures/box_jenkins/predictive_power.png}
 	\caption{Predictive power of the two SARIMA models (1 and 3) compared with the last two years of the original data (\textit{in dotted black}).}
 	\label{fig:predictive-power}
 \end{figure}
 
-...
+In the above plot, we notice the two forecasting follow roughly the datas excepted for the moments when the data vary a lot.
 
 Looking at the MSE of the prediction, we notice that the model 3 is slightly better than model 1 with an MSE of $0.134$.
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\textwidth]{figures/box_jenkins/predictive_power_mse.png}
+	\includegraphics[width=0.4\textwidth]{figures/box_jenkins/predictive_power_mse.png}
 	\caption{Predictive power of the two SARIMA models (1 and 3).}
 	\label{fig:predictive-power-mse}
 \end{figure}
@@ -197,4 +196,4 @@ Therefore, we choose to keep the model $3$ as the final model for forecasting. T
 \begin{equation} \label{eq:final-model}
 	(1 - \phi_1 B)(1 - B)(1 - B^{12}) = (1 + \theta_1 B)(1 + \Theta_1 B^{12}) \varepsilon_t
 \end{equation}
-where $B$ is the \textit{"backshift operator"} and $\phi_1 = 0.3529$, $\theta_1 = -0.8946$, $\Theta_1 = -0.9999$.
+where $B$ is the \textbf{backshift operator} and $\phi_1 = 0.3529$, $\theta_1 = -0.8946$, $\Theta_1 = -0.9999$.
