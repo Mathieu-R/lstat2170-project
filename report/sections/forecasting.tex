@@ -1,6 +1,6 @@
 \section{Forecasting}
 
-In the last part of this project, we want to forecast the monthly mean air temperature in Recife for the year $1996$. We first forecast for the next $12$ months using our SARIMA chosen model.
+In the last part of this project, we want to forecast the monthly mean air temperature in Recife for the year $1996$. We first forecast for the next $18$ months using our SARIMA chosen model.
 
 \begin{figure}[H]
 	\centering
@@ -26,4 +26,13 @@ where $m = 12$ is the number of seasons in a year, $k \equiv \text{int}(h - 1) /
 	\includegraphics[width=0.9\textwidth]{figures/forecast/hw_forecast.png}
 	\caption{Forecast with a Holt-Winters' seasonal method of the mean monthly air temperature in Recife (Brazil) for the next 12 months}
 	\label{fig:hw-forecast}
+\end{figure}
+
+We notice the two forecasts are roughly the same (confirmed in the comparison plot below) even though the prediction interval for the Holt Winter forecast is wider as we go further in the forecast. Both these forecast predict a stabilization in the highest temperatures and an increase in the lowest temperatures of the year.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/forecast/forecast-comparison.png}
+	\caption{Comparison of forecast with a SARIMA model vs Holt-Winters' seasonal method of the mean monthly air temperature in Recife (Brazil) for the next 12 months}
+	\label{fig:forecast-comparison}
 \end{figure}

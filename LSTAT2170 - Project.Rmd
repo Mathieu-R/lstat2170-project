@@ -310,14 +310,14 @@ data.frame(
 ### Forecasting
 
 ```{r}
-prediction <- model3 %>% forecast(h = 12)
+prediction <- model3 %>% forecast(h = 18)
 
 combined_data <- data.frame(
   Date = c(time(temp_ts), time(prediction$mean)),
   Temperature = c(temp_ts, prediction$mean),
   Upper = c(rep(NA, length(temp_ts)), prediction$upper[, 2]),
   Lower = c(rep(NA, length(temp_ts)), prediction$lower[, 2]),
-  Type = c(rep("Data", length(temp_ts)), rep("Forecast", 12))
+  Type = c(rep("Data", length(temp_ts)), rep("Forecast", 18))
 )
 
 ggplot(combined_data, aes(x = Date, y = Temperature)) +
@@ -325,7 +325,7 @@ ggplot(combined_data, aes(x = Date, y = Temperature)) +
   geom_ribbon(aes(ymin = Lower, ymax = Upper), fill = "lightblue", alpha = 0.3) +
   scale_color_manual(values = c("Data" = "black", "Forecast" = "blue")) +
   labs(
-    title = "Forecast of mean monthly temperature in Recife (Brazil) for the next 12 months",
+    title = "Forecast of mean monthly temperature in Recife (Brazil) for the next 18 months",
     subtitle = "Forecast made with a SARIMA model",
     x = "Year", 
     y = "Air temperature (°C)"
@@ -334,14 +334,14 @@ ggplot(combined_data, aes(x = Date, y = Temperature)) +
 ```
 
 ```{r}
-prediction <- ets(temp_ts) %>% forecast(h = 12)
+prediction <- ets(temp_ts) %>% forecast(h = 18)
 
 combined_data <- data.frame(
   Date = c(time(temp_ts), time(prediction$mean)),
   Temperature = c(temp_ts, prediction$mean),
   Upper = c(rep(NA, length(temp_ts)), prediction$upper[, 2]),
   Lower = c(rep(NA, length(temp_ts)), prediction$lower[, 2]),
-  Type = c(rep("Data", length(temp_ts)), rep("Forecast", 12))
+  Type = c(rep("Data", length(temp_ts)), rep("Forecast", 18))
 )
 
 ggplot(combined_data, aes(x = Date, y = Temperature)) +
@@ -349,10 +349,39 @@ ggplot(combined_data, aes(x = Date, y = Temperature)) +
   geom_ribbon(aes(ymin = Lower, ymax = Upper), fill = "lightblue", alpha = 0.3) +
   scale_color_manual(values = c("Data" = "black", "Forecast" = "blue")) +
   labs(
-    title = "Forecast of mean monthly temperature in Recife (Brazil) for the next 12 months", 
+    title = "Forecast of mean monthly temperature in Recife (Brazil) for the next 18 months", 
     subtitle = "Forecast made with Holt Winters' seasonal method",
     x = "Year", 
     y = "Air temperature (°C)"
   ) + 
+  theme_minimal()
+```
+```{r}
+arima.prediction <- model3 %>% forecast(h = 18)
+hw.prediction <- ets(temp_ts) %>% forecast(h = 18)
+
+date <- zoo::as.Date(arima.prediction$mean)
+
+compare_ts <- data.frame(
+  date = date,
+  arima = arima.prediction$mean,
+  hw = hw.prediction$mean
+) %>%
+  gather(key = "series", value = "values", -date)
+
+ggplot(compare_ts, aes(x = date, y = values, color = series)) +
+  geom_line() + 
+  scale_color_manual(
+    values = c("arima" = "orange", "hw" = "darkblue"),
+    labels = c("arima"= "SARIMA", "hw" = "Holt Winters")
+  ) +
+  scale_linetype_manual(values = c("arima" = "solid", "hw"= "solid")) +
+  scale_size_manual(values = c("arima" = 1.0, "hw" = 1.0)) +
+  labs(
+      x = "Date",
+      y = "Air temperature (°C)",
+      title = "Forecast comparison for mean monthly temperature in Recife (Brazil)",
+      color = "Series"
+    ) +
   theme_minimal()
 ```

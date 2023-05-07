@@ -1,9 +1,7 @@
 \section{Introduction}
 
-The aim of this project is to analyse the mean monthly temperature in ($^\circ$) in the city of Recife (Brazil) from $1986$ to $1995$.
+The aim of this project is to analyse the mean monthly temperature (in $\SI{}{\celsius}$) in the city of Recife (Brazil) from $1986$ to $1995$.
 
-First, we will begin by an analysis of the data. We will first check for any trend, seasonalities or variability of the variance and apply ad-hoc method in order to be able to analyze the ACF and PACF plots of the data. These plots should give us a first intuition of a possible model to model our data.
-We will then use automatic model selection using different criterions like the AIC, BIC in order to confirm our intuition and help us to select one or two final models.
-We will then test our model(s) ...
-
-Finally, we will ensure our model has good prediction power use it to predict the temperature for the city of Recife in $1996$. 
+First, we will begin by an analysis of the data. We will first check for any trend, seasonalities or variability of the variance and apply ad-hoc method in order to be able to analyze the autocorrelation and partial-autocorrelation plots (respectively abbreviated as \textit{ACF} and \textit{PACF}) of the data. These plots should give us a first intuition of a possible model to model our data.
+We will then use automatic model selection using different criterions like the AIC, BIC in order to confirm our intuition and help us to select two or three final models.
+We will finally test our model(s) (analyse of coefficient significance, analysis of the residuals, prediction power) in order to choose the best one and use it to make a forecast for the next $18$ months.
